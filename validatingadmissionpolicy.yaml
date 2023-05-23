@@ -1,0 +1,12 @@
+apiVersion: k3d.io/v1alpha4 # this will change in the future as we make everything more stable
+kind: Simple # internally, we also have a Cluster config, which is not yet available externally
+image: rancher/k3s:v1.26.2-k3s1 # same as `--image rancher/k3s:v1.20.4-k3s1`
+options:
+  k3s: # options passed on to K3s itself
+    extraArgs:
+    - arg: --kube-apiserver-arg=feature-gates=ValidatingAdmissionPolicy=true
+      nodeFilters:
+      - server:*
+    - arg: --kube-apiserver-arg=runtime-config=admissionregistration.k8s.io/v1alpha1=true
+      nodeFilters:
+      - server:*

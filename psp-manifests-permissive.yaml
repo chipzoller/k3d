@@ -1,0 +1,55 @@
+### This manifest must be applied after bringing up a cluster
+### with PSPs enabled so kube-system Pods come into a running state
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: permissive
+  annotations:
+    seccomp.security.alpha.kubernetes.io/allowedProfileNames: "*"
+spec:
+  privileged: true
+  hostNetwork: true
+  hostIPC: true
+  hostPID: true
+  seLinux:
+    rule: RunAsAny
+  supplementalGroups:
+    rule: RunAsAny
+  runAsUser:
+    rule: RunAsAny
+  fsGroup:
+    rule: RunAsAny
+  hostPorts:
+  - min: 0
+    max: 65535
+  volumes:
+  - '*'
+  allowedCapabilities:
+  - '*'
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: psp-permissive
+rules:
+- apiGroups:
+  - extensions
+  resources:
+  - podsecuritypolicies
+  resourceNames:
+  - permissive
+  verbs:
+  - use
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: psp-default
+subjects:
+- kind: Group
+  name: system:serviceaccounts
+  namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: psp-permissive
+  apiGroup: rbac.authorization.k8s.io

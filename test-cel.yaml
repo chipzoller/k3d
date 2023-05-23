@@ -1,0 +1,31 @@
+### Once this is created, attempting to create the Namespace called `pci` without the label
+### `team` will result in failure.
+apiVersion: admissionregistration.k8s.io/v1alpha1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: ns-labels
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+    - apiGroups:
+      - ""
+      apiVersions:
+      - v1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - namespaces
+      resourceNames:
+      - pci
+  validations:
+    - expression: "'team' in object.metadata.labels"
+      message: The label team is required.
+---
+apiVersion: admissionregistration.k8s.io/v1alpha1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: ns-binding
+spec:
+  policyName: ns-labels

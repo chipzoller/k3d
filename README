@@ -1,0 +1,28 @@
+#### Create a cluster using the ZollerLabCA for trust of harbor2.zoller.com
+k3d cluster create foobar --volume /usr/local/share/ca-certificates/zollerlabca.crt:/etc/ssl/certs/yourcert.crt
+
+#### Create a cluster with Pod Security Admission using a AdmissionControl file
+k3d cluster create psa -c psa.yaml --volume /home/chip/docs/k3d/admissioncontrolfile.yaml:/etc/kubernetes/admissioncontrolfile.yaml
+
+The config file looks like:
+
+apiVersion: k3d.io/v1alpha4 # this will change in the future as we make everything more stable
+kind: Simple # internally, we also have a Cluster config, which is not yet available externally
+image: rancher/k3s:v1.24.2-k3s1 # same as `--image rancher/k3s:v1.20.4-k3s1`
+options:
+  k3s: # options passed on to K3s itself
+    extraArgs:
+    - arg: --kube-apiserver-arg=admission-control-config-file=/etc/kubernetes/admissioncontrolfile.yaml
+      nodeFilters:
+      - server:*
+
+#### Create a cluster with ValidatingAdmissionPolicy enabled (i.e., CEL admission)
+
+k3d cluster create cel -c validatingadmissionpolicy.yaml
+
+#### Create a cluster with Pod Security Policy (PSP) enabled on 1.24
+
+k3d cluster create psp -c psp.yaml
+
+Once the cluster is up, you must apply psp-manifests-permissive.yaml so kube-system Pods can run.
+You may need to delete ReplicaSets in kube-system after applying the manifest so a new one will get triggered.

@@ -1,0 +1,9 @@
+apiVersion: k3d.io/v1alpha4 # this will change in the future as we make everything more stable
+kind: Simple # internally, we also have a Cluster config, which is not yet available externally
+image: rancher/k3s:v1.24.2-k3s1 # same as `--image rancher/k3s:v1.20.4-k3s1`
+options:
+  k3s: # options passed on to K3s itself
+    extraArgs:
+    - arg: --kube-apiserver-arg=admission-control-config-file=/etc/kubernetes/admissioncontrolfile.yaml
+      nodeFilters:
+      - server:*

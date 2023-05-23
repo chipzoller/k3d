@@ -1,0 +1,9 @@
+apiVersion: k3d.io/v1alpha4
+kind: Simple
+image: rancher/k3s:v1.24.13-k3s1
+options:
+  k3s:
+    extraArgs:
+    - arg: --kube-apiserver-arg=enable-admission-plugins=PodSecurityPolicy
+      nodeFilters:
+      - server:*
